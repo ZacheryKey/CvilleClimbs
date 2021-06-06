@@ -1,0 +1,91 @@
+/*Select all info from each table*/
+SELECT * FROM person;
+SELECT * FROM route;
+SELECT * FROM location;
+SELECT * FROM route_setting;
+SELECT * FROM log;
+SELECT * FROM route_setter;
+SELECT * FROM climber;
+SELECT * FROM admin;
+
+/*Get contact info for all route setters*/
+SELECT f_name, l_name, email, phone
+FROM person NATURAL JOIN route_setter;
+
+/* Get list of all people who are admin AND climbers */
+SELECT person_id, f_name, l_name 
+FROM person NATURAL JOIN admin NATURAL JOIN climber;
+
+/*Get all of the locations EAST (lower longitude) of charlottesville preserve*/
+SELECT location_id, name, latitude, longitude
+FROM location
+WHERE longitude < (SELECT longitude
+                   FROM location
+                   WHERE name='charlottesville preserve');
+
+/*Get total number of routes as well as difficulty level of each route*/
+SELECT  (SELECT COUNT(*)
+        FROM route
+        WHERE difficulty BETWEEN 4 AND 5) AS easy_routes,
+        (SELECT COUNT(*)
+        FROM route
+        WHERE difficulty BETWEEN 5.1 AND 5.4) AS medium_routes,
+        (SELECT COUNT(*)
+        FROM route
+        WHERE difficulty BETWEEN 5.5 AND 6) AS hard_routes,
+        (SELECT COUNT(*)
+        FROM route) AS total_routes, 
+        (SELECT COUNT(*)
+        FROM location) AS total_locations
+FROM    dual;
+
+/*Get average route rating for loacation as well as number of routes*/
+SELECT ROUND(AVG(rating),2) AS 'Average Rating', 
+    ROUND(MIN(rating)) AS 'Min Rating',
+    ROUND(MAX(rating)) AS 'Max Rating',
+    ROUND(AVG(difficulty),2) AS 'Average Difficulty',
+    COUNT(*) AS 'Number of Routes', 
+    location.name AS 'Location Name'
+FROM route JOIN location USING (location_id)
+GROUP BY location_id;
+
+/*Get the total number of each type of system user*/
+SELECT  (SELECT COUNT(*)
+        FROM   climber) AS count_climber,
+        (SELECT COUNT(*)
+        FROM   route_setter) AS count_route_setter,
+        (SELECT COUNT(*)
+        FROM `admin`) AS count_admin,
+        (SELECT COUNT(*)
+        FROM person) AS count_total
+FROM    dual;
+
+/*See what type of person each person is*/
+SELECT person_id, CONCAT(f_name,' ',`initial`,' ',l_name) AS 'full_name', 
+    exp_lvl IS NOT NULL AS 'is_climber', 
+    route_setter.route_setting_exp_lvl IS NOT NULL AS 'is_route_setter', 
+    `admin`.has_edit_permission IS NOT NULL AS 'is_admin'
+FROM person LEFT JOIN climber USING (person_id) LEFT JOIN route_setter USING (person_id) LEFT JOIN `admin` USING (person_id);
+
+/*Master Data file of all of the routes from all of the locations, their difficulty, rating, type, comments and beta*/
+SELECT location_id, route_id, latitude, longitude, 
+location.name AS 'location name', route.name AS 'route name', 
+difficulty, rating, route.`type`, `log`.`comment`, `log`.`route_beta`
+FROM location JOIN route USING (location_id) LEFT JOIN `log` USING (route_id);
+
+/*Master Data File of all of the people in our database*/
+SELECT person_id, CONCAT(f_name,' ',`initial`,' ',l_name) AS 'Full Name',
+    exp_lvl IS NOT NULL AS 'is_climber', 
+    route_setter.route_setting_exp_lvl IS NOT NULL AS 'is_route_setter', 
+    `admin`.has_edit_permission IS NOT NULL AS 'is_admin',
+    exp_lvl AS 'Climbing Experience Level', 
+    route_setter.route_setting_exp_lvl AS 'Route Setting Experience Level', 
+    `admin`.has_edit_permission AS 'Admin Edit Permission'
+FROM person LEFT JOIN climber USING (person_id) LEFT JOIN route_setter USING (person_id) LEFT JOIN `admin` USING (person_id);
+
+/*Join together the tables with many to many connections through the associated entity table*/
+SELECT route.name AS 'route_name', CONCAT(person.f_name, ' ',person.`initial`, ' ',person.l_name) AS 'creator_name', 
+    person_id, route_id
+FROM route_setting JOIN person USING (person_id) JOIN route USING (route_id)
+
+
