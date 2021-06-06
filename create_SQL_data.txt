@@ -1,0 +1,335 @@
+CREATE TABLE location 
+(location_id INT NOT NULL AUTO_INCREMENT,
+ latitude DECIMAL(10,8) NOT NULL,
+ longitude DECIMAL(10,8) NOT NULL, 
+ name VARCHAR(64) NOT NULL,
+ entrance_city VARCHAR(255),
+ entrance_zip VARCHAR(255),
+ entrance_address VARCHAR(255),
+ num_routes INT NOT NULL,
+ PRIMARY KEY (location_id),
+ CONSTRAINT Check_Location CHECK (-180<longitude AND longitude<180 AND -90<latitude AND latitude<90));
+
+CREATE TABLE person
+(person_id INT NOT NULL AUTO_INCREMENT,
+ f_name VARCHAR(32) NOT NULL,
+ l_name VARCHAR(32) NOT NULL,
+ initial VARCHAR(3) NOT NULL, 
+ email VARCHAR(64) NOT NULL,
+ phone BIGINT(10) NOT NULL,
+ PRIMARY KEY (person_id));
+
+CREATE TABLE route 
+(route_id INT NOT NULL AUTO_INCREMENT, 
+ name VARCHAR(64) NOT NULL, 
+ difficulty DECIMAL(10,8) NOT NULL,
+ rating DECIMAL,
+ type enum('indoor','outdoor') NOT NULL,
+ location_id INT NOT NULL,
+ PRIMARY KEY (route_id),
+ FOREIGN KEY (location_id) REFERENCES location (location_id), 
+ CONSTRAINT check_rating CHECK (rating>=0 AND rating<=10),
+ CONSTRAINT check_difficulty CHECK (difficulty>=0 AND difficulty<=6));
+
+CREATE TABLE log 
+(log_id INT NOT NULL AUTO_INCREMENT, 
+ person_id INT NOT NULL, 
+ comment LONGTEXT NOT NULL,
+ route_beta LONGTEXT,
+ route_id INT NOT NULL,
+ PRIMARY KEY (log_id),
+ FOREIGN KEY (route_id) REFERENCES route(route_id),
+ FOREIGN KEY (person_id) REFERENCES person(person_id));
+
+CREATE TABLE route_setting
+(route_id INT NOT NULL,
+ person_id INT NOT NULL,
+ PRIMARY KEY (route_id, person_id),
+ FOREIGN KEY (route_id) REFERENCES route(route_id),
+ FOREIGN KEY (person_id) REFERENCES person(person_id));
+
+CREATE TABLE route_setter
+(person_id INT NOT NULL,
+ n_routes_created INT NOT NULL,
+ route_setting_exp_lvl DECIMAL NOT NULL,
+ certifications LONGTEXT,
+ PRIMARY KEY (person_id),
+ FOREIGN KEY (person_id) REFERENCES person (person_id));
+
+CREATE TABLE climber
+(person_id INT NOT NULL,
+ exp_lvl DECIMAL NOT NULL, 
+ routes_attempted INT NOT NULL,
+ is_team_member BOOLEAN NOT NULL,
+ PRIMARY KEY (person_id),
+ FOREIGN KEY (person_id) REFERENCES person (person_id));
+
+CREATE TABLE admin
+(person_id INT NOT NULL,
+ has_edit_permission BOOLEAN NOT NULL, 
+ has_delete_permission BOOLEAN NOT NULL, 
+ has_create_permission BOOLEAN NOT NULL, 
+ is_owner BOOLEAN NOT NULL,
+ PRIMARY KEY (person_id),
+ FOREIGN KEY (person_id) REFERENCES person (person_id));
+
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('zach', 'patel', 'v.', 'zach_patel@yahoo.com', 4345622994);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('alex', 'scott', 's.', 'alex_scott@gmail.com', 4341949978);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('veer', 'beesly', 'v.', 'veer_beesly@b2x.online.com', 4341284980);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('rachel', 'scott', 'g.', 'rachel_scott@gmail.com', 4346215110);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('nano', 'beesly', 'w.', 'nano_beesly@b2x.online.com', 4348662127);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('cozy', 'patel', 'r.', 'cozy_patel@b2x.online.com', 4349915027);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('zach', 'scott', 'i.', 'zach_scott@yahoo.com', 4344049457);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('cozy', 'scott', 'l.', 'cozy_scott@yahoo.com', 4349487103);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('ron', 'vincil', 'b.', 'ron_vincil@hotmail.com', 4348590255);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('darnel', 'lebo', 'o.', 'darnel_lebo@gmail.com', 4349819850);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('abi', 'parnel', 'o.', 'abi_parnel@hotmail.com', 4347644975);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('abi', 'stewart', 'h.', 'abi_stewart@gmail.com', 4346433420);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('ron', 'lloyd', 'v.', 'ron_lloyd@yahoo.com', 4348657984);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('egret', 'stewart', 'h.', 'egret_stewart@hotmail.com', 4347786244);
+INSERT INTO person (f_name, l_name, initial, email, phone) 
+VALUES ('andrew', 'porter', 'a.', 'andrew_porter@yahoo.com', 4343246027);
+
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-77.87743452097769, -37.25146865215822, 'montauk state park', 7);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.77302573692634, -37.18968822331554, 'mcafees reservoir', 6);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.92249308399882, -37.82116632935441, 'george washington rocks', 5);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.57676649730314, -38.10528986713639, 'mcafees national park', 3);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-79.40465190786584, -38.86254260063368, 'appalachain nature preserve', 1);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.4832882756912, -38.518816070142776, 'charlottesville preserve', 3);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-77.6019031816802, -37.906484648449876, 'george washington preserve', 2);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.78874877680677, -38.19521901533354, 'mcafees rocks', 7);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-79.44451602447512, -38.789354308730395, 'blueridge mountain', 2);
+INSERT INTO location (latitude, longitude, name, num_routes) 
+VALUES (-78.08688251990857, -38.42164021672905, 'appalachain preserve', 4);
+
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("abi's lame-ass squeeze", 4.0, 5.0, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("grace's timid tumble", 5.3, 4.5, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("sherry's hard-ass manuever", 4.9, 8.0, 'outdoor', 10);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("veer's terrible squeeze", 5.3, 4.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("andrew's timid squeeze", 5.0, 5.5, 'outdoor', 9);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("andy's inspiring hike", 4.2, 9.5, 'outdoor', 6);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("darnel's piece-of-cake boulder-problem", 4.3, 7.0, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("tyler's indubious scramble", 4.8, 8.0, 'outdoor', 10);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("abi's downright-difficult challenge", 5.1, 6.5, 'outdoor', 5);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("andrew's incredible tumble", 5.2, 10.0, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("cozy's indubious challenge", 4.8, 6.0, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("shrimp's scary-ass manuever", 5.0, 7.0, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("nano's piece-of-cake tumble", 4.1, 8.0, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("nano's incredible squeeze", 5.3, 4.0, 'outdoor', 9);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("willy's downright-difficult hike", 5.8, 10.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("willy's downright-difficult manuever", 4.8, 9.0, 'outdoor', 3);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("willy's tricky tumble", 5.4, 7.5, 'outdoor', 4);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("sherry's awful ascent", 4.0, 7.5, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("alex's scary-ass scramble", 4.1, 6.5, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("andrew's terrible manuever", 5.3, 5.5, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("nano's inspiring ascent", 4.1, 4.0, 'outdoor', 7);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("darnel's tricky boulder-problem", 5.5, 8.5, 'outdoor', 3);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("alex's timid scramble", 4.3, 5.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("rachel's tricky scramble", 4.8, 5.5, 'outdoor', 10);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("sherry's tricky boulder-problem", 4.0, 9.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("darnel's scary-ass hike", 4.9, 10.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("shrimp's cringy tumble", 5.7, 4.5, 'outdoor', 3);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("shrimp's incredible bluff", 6.0, 6.0, 'outdoor', 10);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("zach's lame-ass ascent", 4.9, 5.0, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("andrew's lame-ass manuever", 4.0, 5.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("cozy's lame-ass tumble", 4.5, 7.5, 'outdoor', 2);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("michael's downright-difficult boulder-problem", 5.6, 4.5, 'outdoor', 7);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("perry's downright-difficult hurdle", 5.2, 9.0, 'outdoor', 8);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("alex's piece-of-cake challenge", 5.1, 4.5, 'outdoor', 3);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("perry's lame-ass tumble", 4.2, 5.0, 'outdoor', 1);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("alex's indubious hurdle", 5.7, 6.0, 'outdoor', 4);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("cozy's terrible scramble", 5.9, 8.5, 'outdoor', 6);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("cozy's hard-ass hurdle", 4.2, 6.5, 'outdoor', 3);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("zach's inspiring tumble", 5.3, 6.0, 'outdoor', 6);
+INSERT INTO route (name, difficulty, rating, type, location_id) 
+VALUES ("willy's downright-difficult manuever", 5.5, 10.0, 'outdoor', 4);
+
+INSERT INTO route_setting (route_id, person_id) VALUES (1, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (1, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (1, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (2, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (2, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (2, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (3, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (4, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (5, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (5, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (5, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (6, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (6, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (6, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (7, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (8, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (8, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (9, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (9, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (10, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (10, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (10, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (11, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (11, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (11, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (12, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (13, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (14, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (14, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (15, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (16, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (16, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (16, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (17, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (17, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (17, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (18, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (18, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (18, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (19, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (19, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (20, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (20, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (20, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (21, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (22, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (22, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (23, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (24, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (24, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (24, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (25, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (25, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (26, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (26, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (27, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (27, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (28, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (28, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (29, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (29, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (29, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (30, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (30, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (30, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (31, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (31, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (32, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (32, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (32, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (33, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (33, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (33, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (34, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (35, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (35, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (36, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (36, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (36, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (37, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (37, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (37, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (38, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (38, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (38, 4);
+INSERT INTO route_setting (route_id, person_id) VALUES (39, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (39, 2);
+INSERT INTO route_setting (route_id, person_id) VALUES (40, 12);
+INSERT INTO route_setting (route_id, person_id) VALUES (40, 2);
+
+INSERT INTO route_setter (person_id, n_routes_created, route_setting_exp_lvl, certifications) VALUES (2.0, 31.0, 7.4, NULL);
+INSERT INTO route_setter (person_id, n_routes_created, route_setting_exp_lvl, certifications) VALUES (4.0, 18.0, 4.7, NULL);
+INSERT INTO route_setter (person_id, n_routes_created, route_setting_exp_lvl, certifications) VALUES (12.0, 40.0, 9.2, NULL);
+
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (6.0, 9.3, 38.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (4.0, 4.8, 18.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (3.0, 4.7, 18.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (8.0, 10.0, 38.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (11.0, 5.9, 17.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (9.0, 6.9, 29.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (2.0, 7.1, 25.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (1.0, 6.6, 27.0, 0.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (10.0, 3.4, 11.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (12.0, 10.0, 37.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (13.0, 5.5, 18.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (7.0, 7.8, 28.0, 1.0);
+INSERT INTO climber (person_id, exp_lvl, routes_attempted, is_team_member) VALUES (14.0, 4.6, 14.0, 1.0);
+
+INSERT INTO admin (person_id, has_edit_permission, has_delete_permission, has_create_permission, is_owner) 
+VALUES (5, 1, 1, 0, 0);
+INSERT INTO admin (person_id, has_edit_permission, has_delete_permission, has_create_permission, is_owner) 
+VALUES (15, 1, 1, 1, 0);
+INSERT INTO admin (person_id, has_edit_permission, has_delete_permission, has_create_permission, is_owner) 
+VALUES (11, 1, 1, 1, 0);
+INSERT INTO admin (person_id, has_edit_permission, has_delete_permission, has_create_permission, is_owner) 
+VALUES (13, 1, 1, 1, 0);
+
+INSERT INTO log (person_id, comment, route_beta, route_id) 
+VALUES (14, 'lots of fun, very easy course', 'toe hook on sharp ledge marked with chalk', 26);
+INSERT INTO log (person_id, comment, route_beta, route_id) 
+VALUES (13, 'hella dangerous without proper equipment', 'dyno from hold marked 2 onto blue overhang marked 5', 14);
+INSERT INTO log (person_id, comment, route_beta, route_id) 
+VALUES (11, 'name is deceptive: easiest course at blueridge', 'use the crack to the left of red marker as primary hand hold', 16);
+INSERT INTO log (person_id, comment, route_beta, route_id) 
+VALUES (6, 'too easy not worth the drive', 'karate kick over between boulders', 34);
+INSERT INTO log (person_id, comment, route_beta, route_id) 
+VALUES (4, 'more of a steep climb with small amounts of bouldering', 'mantle blue ledge', 35);
